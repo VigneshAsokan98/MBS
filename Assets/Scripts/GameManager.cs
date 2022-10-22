@@ -28,10 +28,16 @@ public class GameManager : MonoBehaviour
 
     private gameState CurrentState = gameState.Idle;
 
-    private bool isColliding;
+    public bool isColliding;
+
+    public Material IndicatorMat;
     private void Awake()
     {
         instance = this;
+    }
+    private void Start()
+    {
+        IndicatorMat.color = Color.green;
     }
     private void Update()
     {
@@ -68,10 +74,18 @@ public class GameManager : MonoBehaviour
         {
             SelectedObject.transform.position = hitInfo.point;
         }
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !isColliding)
         {
             //SelectedObject = null;
             SwitchState(gameState.Idle);
+        }
+        if(Input.GetKey(KeyCode.Q))
+        {
+            SelectedObject.transform.Rotate(Vector3.up);
+        }
+        if(Input.GetKey(KeyCode.E))
+        {
+            SelectedObject.transform.Rotate(-Vector3.up);
         }
     }
 
@@ -99,7 +113,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("FloorHit");
             Indicator.transform.position = hitInfo.point;
         }
-        if (Input.GetMouseButtonDown(0) && PlacingObject)
+        if (Input.GetMouseButtonDown(0) && !isColliding)
         {
             placeObject();
             SwitchState(gameState.Idle);
@@ -114,7 +128,7 @@ public class GameManager : MonoBehaviour
 
     public void placeObject()
     {
-        PlacingObject = false;
+        //PlacingObject = false;
         if(indicatorMesh)
             Destroy(indicatorMesh);
         
@@ -127,9 +141,11 @@ public class GameManager : MonoBehaviour
     public void ObjectSelected(Shape shape)
     {
         SelectedShape = (int)shape;
-        PlacingObject = true;
+        //PlacingObject = true;
         indicatorMesh = Instantiate(ShapesPrefab[SelectedShape], Indicator.transform);
-
+        indicatorMesh.tag = "Indicator";
+        indicatorMesh.transform.GetChild(0).tag = "Indicator";
+        indicatorMesh.transform.GetChild(0).GetComponent<MeshRenderer>().material = IndicatorMat;
         SwitchState(gameState.PlacingObjects);
     }
 
@@ -144,5 +160,15 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("OBJECT HIT");
         }
+    }
+
+    internal void Colliding(bool val)
+    {
+        if(val)
+            IndicatorMat.color = Color.red;
+        else
+            IndicatorMat.color = Color.green;
+
+        isColliding = val;
     }
 }
