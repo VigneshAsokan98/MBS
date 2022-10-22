@@ -9,5 +9,10 @@ public class UIManager : MonoBehaviour
         GameManager.instance.ObjectSelected((Shape)shape);
     }
 
+    public void DeleteObject()
+    {
+        GameManager.instance.DeleteSelected();
+    }
+
 }
 
